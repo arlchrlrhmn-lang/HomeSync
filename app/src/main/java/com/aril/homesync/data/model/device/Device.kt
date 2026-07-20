@@ -6,6 +6,6 @@ data class Device(
     val type: String,
     val location: String,
     val status: String,
-    val photo: String
+    val icon: String
 )
 

@@ -11,7 +11,7 @@ import com.aril.homesync.data.model.login.LoginResponse
 import com.aril.homesync.data.repository.AuthRepository
 import com.aril.homesync.databinding.ActivityLoginBinding
 import com.google.gson.Gson
-import com.aril.homesync.ui.home.HomeActivity
+import com.aril.homesync.ui.main.MainActivity
 import com.aril.homesync.utils.SessionManager
 import retrofit2.Call
 import retrofit2.Callback
@@ -118,7 +118,7 @@ class LoginActivity : AppCompatActivity() {
                             photo = user.photo ?: ""
                         )
 
-                        startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     }
 
