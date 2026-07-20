@@ -11,8 +11,7 @@ import com.aril.homesync.data.model.login.LoginResponse
 import com.aril.homesync.data.repository.AuthRepository
 import com.aril.homesync.databinding.ActivityLoginBinding
 import com.google.gson.Gson
-import com.aril.homesync.data.model.common.ApiErrorResponse
-import com.aril.homesync.ui.main.MainActivity
+import com.aril.homesync.ui.home.HomeActivity
 import com.aril.homesync.utils.SessionManager
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,9 +23,7 @@ class LoginActivity : AppCompatActivity() {
     private var isPasswordVisible = false
 
     private val gson = Gson()
-
     private val repository = AuthRepository()
-
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,27 +39,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setUpListener() {
-
         binding.btnLogin.setOnClickListener {
-
             if (validateInput()) {
                 login()
-
             }
         }
 
         binding.tvForgotPassword.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    ForgotPasswordActivity::class.java
-                )
-            )
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
         }
     }
 
     private fun validateInput(): Boolean {
-
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString().trim()
 
@@ -75,9 +63,7 @@ class LoginActivity : AppCompatActivity() {
             binding.tilEmail.error = null
         }
 
-        if (email.isNotEmpty() &&
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        ) {
+        if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.tilEmail.error = "Invalid email format"
             isValid = false
         }
@@ -92,104 +78,72 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setUpPasswordToggle() {
-
         binding.tilPassword.setEndIconOnClickListener {
             isPasswordVisible = !isPasswordVisible
 
             if (isPasswordVisible) {
                 binding.etPassword.inputType =
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-
                 binding.tilPassword.setEndIconDrawable(R.drawable.view)
             } else {
                 binding.etPassword.inputType =
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 binding.tilPassword.setEndIconDrawable(R.drawable.hide)
             }
-                binding.etPassword.setSelection(
-                    binding.etPassword.text?.length ?: 0)
-            }
+            binding.etPassword.setSelection(binding.etPassword.text?.length ?: 0)
         }
+    }
 
     private fun login() {
+        // Reset error
+        binding.tilEmail.error = null
+        binding.tilPassword.error = null
 
         val request = LoginRequest(
             email = binding.etEmail.text.toString().trim(),
             password = binding.etPassword.text.toString().trim()
         )
 
-        repository.login(request).enqueue(object: Callback<LoginResponse> {
-            override fun onResponse(
-                call: Call<LoginResponse>,
-                response: Response<LoginResponse>
-            ) {
+        repository.login(request).enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful && response.body() != null) {
-
                     val user = response.body()!!.data
-
-                    sessionManager.saveLoginSession(
-                        token = user.token,
-                        email = user.email,
-                        name = user.name,
-                        role = user.role,
-                        photo = user.photo
-                    )
-
-                    startActivity(
-                        Intent(
-                            this@LoginActivity,
-                            MainActivity::class.java
+                    
+                    if (user != null) {
+                        sessionManager.saveLoginSession(
+                            token = user.token,
+                            email = user.email,
+                            name = user.name,
+                            role = user.role,
+                            photo = user.photo ?: ""
                         )
-                    )
-                    finish()
 
-                    Toast.makeText(
-                        this@LoginActivity,
-                        response.body()!!.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                        finish()
+                    }
 
-                    startActivity(
-                        Intent(
-                            this@LoginActivity,
-                            MainActivity::class.java
-                        )
-                    )
-                    finish()
-
+                    Toast.makeText(this@LoginActivity, response.body()!!.message, Toast.LENGTH_SHORT).show()
                 } else {
-                   val errorBody = response.errorBody()?.string()
+                    val errorMsg = try {
+                        val errorBody = response.errorBody()?.string()
+                        val errorResponse = gson.fromJson(errorBody, LoginResponse::class.java)
+                        errorResponse.message
+                    } catch (e: Exception) {
+                        "Login Failed"
+                    }
 
-                    if (errorBody != null) {
-
-                        val errorResponse = gson.fromJson(
-                            errorBody,
-                            ApiErrorResponse::class.java
-                        )
-                        Toast.makeText(
-                            this@LoginActivity,
-                            errorResponse.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (errorMsg.contains("Email", ignoreCase = true)) {
+                        binding.tilEmail.error = errorMsg
+                    } else if (errorMsg.contains("Password", ignoreCase = true)) {
+                        binding.tilPassword.error = errorMsg
                     } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Unknown error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@LoginActivity, errorMsg, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
 
-            override fun onFailure(
-                call: Call<LoginResponse>,
-                t: Throwable
-            ) {
-                Toast.makeText(
-                    this@LoginActivity,
-                    t.message,
-                    Toast.LENGTH_SHORT
-                ).show()
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_SHORT).show()
             }
         })
     }

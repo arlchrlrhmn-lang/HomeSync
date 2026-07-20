@@ -53,7 +53,6 @@ class SessionManager(context: Context) {
         return sharedPreferences.getString(KEY_PHOTO, null)
     }
 
-
     fun isLoggedIn(): Boolean {
         return getToken() != null
     }
