@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:fillViewport="true"
-    tools:context=".ui.home.HomeActivity">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -349,6 +348,7 @@
                             android:contentDescription="Light"/>
 
                         <TextView
+                            android:id="@+id/tv_light_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="12"
@@ -381,6 +381,7 @@
                             android:contentDescription="camera"/>
 
                         <TextView
+                            android:id="@+id/tv_camera_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="3"
@@ -421,6 +422,7 @@
                             app:tint="@color/primary" />
 
                         <TextView
+                            android:id="@+id/tv_sensor_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="8"
@@ -453,6 +455,7 @@
                             android:contentDescription="Smart Plug"/>
 
                         <TextView
+                            android:id="@+id/tv_plug_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="5"

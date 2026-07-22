@@ -10,11 +10,11 @@ import retrofit2.Call
 class AuthRepository {
 
     fun login(request: LoginRequest): Call<LoginResponse> {
-        return ApiClient.apiservice.login(request)
+        return ApiClient.apiService.login(request)
     }
 
     fun forgotPassword(request: ForgotPasswordRequest
     ): Call<ForgotPasswordResponse> {
-        return ApiClient.apiservice.forgotPassword(request)
+        return ApiClient.apiService.forgotPassword(request)
     }
 }

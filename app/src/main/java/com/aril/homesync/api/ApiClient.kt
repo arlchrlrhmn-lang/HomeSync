@@ -17,7 +17,7 @@ object ApiClient {
         .addInterceptor(logging)
         .build()
 
-    val apiservice: ApiService by lazy {
+    val apiService: ApiService by lazy {
 
         Retrofit.Builder()
             .baseUrl(BASE_URL)
